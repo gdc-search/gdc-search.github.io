@@ -1,0 +1,172 @@
+
+.session_view_video_title
+{
+	padding-left:20px;
+	font-size:20pt;	
+	font-weight: bold;
+	color:#000000;
+}
+
+
+.session_view_quickbutton_panel
+{
+	width:auto;
+	height:30px;
+	padding-left:20px;
+}
+
+
+.session_view_quickbutton_panel_item
+{
+	width:70px;
+	text-align:center;
+	height:20px;
+	line-height: 20px;
+}
+
+.session_view_video_desc
+{
+	margin-top:20px;
+	margin-bottom:20px;
+}
+
+.session_view_desc_grid,
+.session_view_desc_line
+{
+	display: flex;
+	overflow: hidden;
+}
+
+.session_view_desc_line
+{
+	width:90%;
+	margin:0 auto;
+	margin-top:20px;
+}
+
+.session_view_desc_grid_item,
+.session_view_desc_line_title
+{
+	flex-grow: 1;
+	font-weight:bold;
+}
+.session_view_desc_line_title
+{
+	flex-grow: 1;
+	flex-basis:150px;
+	min-width: 150px;
+}
+.session_view_desc_line_content
+{
+	
+	word-wrap: break-word;
+	word-break:break-all;
+	flex-grow: 1;
+	flex-basis:100%;
+}
+
+.session_view_desc_grid_item
+{
+	text-align: center;
+}
+
+div.session_view_desc_grid_item h1
+{
+	margin:0px;
+	font-size:16;
+	font-weight: bold;
+}
+
+.video_player_controller
+{
+	margin-top:25px;
+	margin-bottom:100px;
+}
+
+.video_player_info_panel
+{
+	display: table;
+	text-align:center;
+	width:300px;
+	margin:0 auto;
+	margin-bottom:20px;
+}
+
+.video_player_info_title, .video_player_info_speed
+{
+	display: table-cell;
+	width:120px;
+}
+
+.video_player_speed_tunners
+{
+	display: table;
+	text-align:center;
+	width:725px;
+	margin:0 auto;
+}
+
+.video_player_speed_tunner_button
+{
+	display:table-cell;
+	line-height:40px;
+	text-align:center;
+	background-color: rgba(200,200,200, 0.3);
+
+	transition: all 0.5s ease;
+
+	cursor: pointer;
+
+	color:#3399FF;
+	text-decoration:none;
+}
+
+.video_player_speed_tunner_button:hover
+{
+	background-color: #ffffff;
+	color: #FF3399;
+}
+
+.video_control
+{
+	background: #000;
+	width:95%;
+	
+	display: table;
+	text-align:center;
+	margin:0 auto;
+}
+
+.video_player_theater_button
+{
+	display:table-cell;
+	line-height:40px;
+	text-align:center;
+	background-color: rgba(200,200,200, 0.3);
+
+	transition: all 0.5s ease;
+
+	cursor: pointer;
+
+	color:#3399FF;
+	text-decoration:none;
+}
+
+.video_player_theater_mode
+{
+	position: fixed !important;
+	top: 0px !important;
+	left: 0px !important;
+	width: 100vw !important;
+	height: 100vh !important;
+	max-width: none !important;
+	max-height: none !important;
+	min-width: 0 !important;
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	z-index: 2147483646 !important;
+	border: none !important;
+	background-color: #000 !important;
+	transform: none !important;
+}

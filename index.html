@@ -1,0 +1,487 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title> GDC Vault Internal </title>
+
+    <link rel="stylesheet" type="text/css" href="styles/style-index.css">
+    <link rel="stylesheet" type="text/css" href="styles/style-search-box.css">
+    <link rel="stylesheet" type="text/css" href="styles/style-list-view.css">
+    <link rel="stylesheet" type="text/css" href="styles/style-video-player.css">
+
+    <script type="text/javascript" src="scripts/modules/vue.min.js"></script>
+    <script type="text/javascript" src="scripts/modules/vue-router.js"></script>
+    <script type="text/javascript" src="scripts/modules/vue-disqus.js"></script>
+    <script type="text/javascript" src="scripts/modules/lodash.js"></script>
+    <script type="text/javascript" src="scripts/modules/hls.min.js"></script>
+    <script type="text/javascript" src="scripts/site/global_bus.js"></script>
+    
+    <script type="text/javascript" src="datasource/gdcvault2003.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2004.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2005.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2006.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2007.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2008.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2009.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2010.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2011.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2012.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2013.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2014.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2015.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2016.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2017.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2018.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2019.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2020.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2021.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2022.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2023.js"></script>
+    <script type="text/javascript" src="datasource/gdcvault2024.js"></script>
+    <script type="text/javascript" src="datasource/local_resources.js"></script>
+
+    <!--评论区留言-->
+    <script type="text/x-template" id="ui-comp-template-session-video-comment">
+        <div class="remote_comments_panel">
+            <!--div>Disqus - scientific comments</div-->
+            <vue-disqus 
+                shortname="gdc-internal"
+                :url="commentURL"
+            ></vue-disqus>
+            </div>
+    </script>
+
+    <!--视频播放器速度控制器模板-->
+    <script type="text/x-template" id="ui-comp-template-video-player-controller">
+        <div class="video_player_controller">
+            <div class="video_player_info_panel">
+                <div class="video_player_info_title">当前播放速度：</div>
+                <div id="video_player_info_speed">x 1.0</div>
+            <div class="video_player_speed_tunner_button" @click="toggleTheaterMode()">网页全屏</div>
+            </div>
+            <div class="video_player_speed_tunners">
+                <div class="video_player_speed_tunner_button" @click="setVideoPlaybackRate(0.50);">x 0.50</div>
+                <div class="video_player_speed_tunner_button" @click="setVideoPlaybackRate(0.75);">x 0.75</div>
+                <div class="video_player_speed_tunner_button" @click="setVideoPlaybackRate(1.00);">x 1.00</div>
+                <div class="video_player_speed_tunner_button" @click="setVideoPlaybackRate(1.25);">x 1.25</div>
+                <div class="video_player_speed_tunner_button" @click="setVideoPlaybackRate(1.50);">x 1.50</div>
+                <div class="video_player_speed_tunner_button" @click="setVideoPlaybackRate(1.75);">x 1.75</div>
+                <div class="video_player_speed_tunner_button" @click="setVideoPlaybackRate(2.00);">x 2.00</div>
+                <div class="video_player_speed_tunner_button" @click="setVideoPlaybackRate(2.50);">x 2.50</div>
+            </div>
+        </div>
+    </script>
+
+    <!--播放本地视频播放器模板-->
+    <script type="text/x-template" id="ui-comp-template-local-video-player">
+        <div>
+            <div class="session_view_desc_line">使用本地视频播放器</div>
+            <br/>
+            <div class="video_control">
+                <video id="video_player" controls="" autoplay="">
+                    <source
+                        :src="sessionVideoURL"
+                        type="video/mp4" />
+
+                    <track v-if="sessionSubtitleURL != ''"
+                        kind="captions" label="google sub" 
+                        :src="sessionSubtitleURL" srclang="en" default="true" crossOrigin="true">
+            
+            </div>
+            </video>
+            <video-player-controller />
+        </div>
+    </script>
+    <!--远程视频播放器专用模板-->
+    <script type="text/x-template" id="ui-comp-template-remote-video-player">
+        <!--跨域问题没办法解决，所直接用chrome 的http访问-->
+        <div>  
+            <div class="video_control" @keyup.esc="onEscPressed">
+                <video id="video_player" controls=""></video>
+                <div>中文字幕需要在控制选项里的Captions手动切换</div>
+            </div>
+        	<video-player-controller :bus="globalBus" />
+        </div>
+    </script>
+
+    <!--视频播放页面右侧组件模板-->
+    <!--视频参数组件模板-->
+    <script type="text/x-template" id="ui-comp-template-video-desc-panel">
+        <div class="session_view_desc_grid">
+            <div class="session_view_desc_grid_item">
+                <div><h1>Category</h1></div>
+                <div class="session_view_desc_grid_content">
+                    {{ globalSettings.categories[sessionItem.shortcat].pretty }}
+                </div>
+            </div>
+            <div class="session_view_desc_grid_item">
+                <div><h1>Year Belongs</h1></div>
+                <div class="session_view_desc_grid_content">
+                    GDC {{ sessionItem.year }}
+                </div>
+            </div>
+            <div class="session_view_desc_grid_item">
+                <div><h1>Session ID</h1></div>
+                <div class="session_view_desc_grid_content">
+                    {{ getSessionItemId(sessionItem) }}
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/x-template" id="ui-comp-template-session-view">
+        <div id="session_video_view">
+            <div class="session_view_video_title"> {{ sessionItem.title }} </div>
+            <div class="session_view_quickbutton_panel">
+                <div class="session_view_quickbutton_panel_item short_category_button">
+                    <div @click="onBack()">&#xab; back</div>
+                </div>
+            </div>
+            <div class="session_view_video_desc">
+                <!--网格视频信息-->
+                <video-desc-panel :sessionItem="sessionItem" />
+                <div class="session_view_desc_line">
+                    <div class="session_view_desc_line_title">Speaker</div>
+                    <div class="session_view_desc_line_content">
+                        {{ sessionItem.speaker }}
+                    </div>
+                </div>
+
+                <div class="session_view_desc_line">
+                    <div class="session_view_desc_line_title">Company</div>
+                    <div class="session_view_desc_line_content">
+                        {{ sessionItem.company }}
+                    </div>
+                </div>
+                
+                <!--overview-->
+                <div class="session_view_desc_line" v-if="sessionItem.overview !='' ">
+                    <div class="session_view_desc_line_title">Overview</div>
+                    <div class="session_view_desc_line_content">
+                        {{ sessionItem.overview }}
+                    </div>
+                </div>
+                
+                <!--课程主页地址-->
+                <slot  v-if="sessionItem.media != 'slider'">
+                    <div class="session_view_desc_line">
+                        <div class="session_view_desc_line_title">Video Page</div>
+                        <div class="session_view_desc_line_content">
+                            <a target="_blank" :href="sessionItem.vpage">
+                                {{ sessionItem.vpage }}
+                            </a>
+                        </div>
+                    </div>
+                    <!--video download -->
+                    <div class="session_view_desc_line">
+                        <div class="session_view_desc_line_title">Video Download</div>
+                        <div class="session_view_desc_line_content">
+                            <a target="_blank" :href="sessionItem.vdownload">
+                                {{sessionItem.vdownload}}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="session_view_desc_line" v-if="'vdownload_mp4' in sessionItem">
+                        <div class="session_view_desc_line_title">Video Download (mp4)</div>
+                        <div class="session_view_desc_line_content">
+                            <a target="_blank" :href="sessionItem.vdownload_mp4">
+                                {{sessionItem.vdownload_mp4}}
+                            </a>
+                        </div>
+                    </div>
+                </slot>
+                <!--slider-->
+                <slot v-if="sessionItem.media != 'video'">
+                    <!--slider download-->
+                    <div class="session_view_desc_line">
+                        <div class="session_view_desc_line_title">Slidler Page</div>
+                        <div class="session_view_desc_line_content">
+                            <a target="_blank" :href="sessionItem.spage">
+                                {{ sessionItem.spage }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="session_view_desc_line">
+                        <div class="session_view_desc_line_title">Slider Download</div>
+                        <div class="session_view_desc_line_content">
+                            <a target="_blank" :href="sessionItem.sdownload">
+                                {{sessionItem.sdownload}}
+                            </a>
+                        </div>
+                    </div>
+                    <!--slider reader-->
+                    <div class="session_view_desc_line">
+                        <div class="session_view_desc_line_title">
+                            <a @click="popupSliderWindow(sessionItem.sdownload)">
+                                Open Online Slider
+                            </a>
+                        </div>
+                        <div v-if="getLocalSliderPath(sessionItem) != ''" class="session_view_desc_line_title">
+                            <a @click="popupSliderWindow(getLocalSliderPath(sessionItem))">
+                                Open Local Slider
+                            </a>
+                        </div>
+                    </div>
+                </slot>
+            </div>
+            <!--video player-->
+            <div class="session_video">
+                <local-video-player
+                    v-if="getLocalVideoURL(sessionItem) != ''"
+                    :sessionVideoURL="getLocalVideoURL(sessionItem)"
+                    :sessionSubtitleURL="getLocalSubtitlesURL(sessionItem)" />
+                <remote-video-player 
+                    v-else
+                    v-if="getRemoteVideoURL(sessionItem) != ''"
+                    :sessionItem="sessionItem"
+                    :bus="globalBus" />
+            </div>
+            <slot v-if="getLocalVideoURL(sessionItem) != '' || getRemoteVideoURL(sessionItem) != ''">
+                <session-video-comment :sessionItem="sessionItem"></session-video-comment>
+            </slot>
+        </div>
+    </script>
+
+    <!--左侧边栏悬停组件模板-->
+    <!--分类目录category链接模板-->
+    <script type="text/x-template" id="ui-comp-template-category-menu">
+        <div>
+            <div :class="fixedHeight?'fixed_height_menu':'not_fixed_height_menu'">
+                <!--The customer-sentiment component's template should have only one root element. -->
+                <div class="category_menu_h2" >GDC 20{{year}}</div>
+                <div v-bind:class="[category != cat.short || enableSameCategory ? 'category_menu_link': 'category_menu_link_disable', 'hover_' + cat.short]" 
+                    v-for="cat in globalSettings.categories"
+                >
+                    <slot v-if="cat.short in globalSettings.dataSources[year]">
+                        <a v-if="category != cat.short || enableSameCategory" 
+                        :href="'#' + composeSessionListUrl(year,cat.short)">
+                            [20{{year}}] {{ cat.pretty }}
+                        </a>
+                        <slot v-else>
+                            [20{{year}}] {{ cat.pretty }}
+                        </slot>
+                    </slot>
+                </div>
+                <div class="category_menu_space"></div>
+            </div>
+        <div>
+    </script>
+
+    <script type="text/x-template" id="ui-comp-template-category-menu-list">
+        <div id="category_menu">
+            <slot v-if="showRelated">
+                <!--同年-->
+                <div class="category_menu_h1"><h1> This Year <h1></div>
+                <category-menu
+                    :year="year"
+                    :category="category"
+                    :fixedHeight="true"
+                    :enableSameCategory="enableSameCategory" />
+                <!--同类型-->
+                <div class="category_menu_h1"><h1> Same Category </h1></div>
+                <div v-bind:class="[enableSameCategory || year!=yearIter ? 'category_menu_link': 'category_menu_link_disable', 'hover_' + globalSettings.categories[category].short]"
+                    v-for="yearIter in yearDesc"
+                >
+                    <slot v-if="category in globalSettings.dataSources[yearIter]">
+                        <a v-if="enableSameCategory || year!=yearIter" :href="'#' + composeSessionListUrl(yearIter,category)">
+                            [20{{yearIter}}] {{ globalSettings.categories[category].pretty }}
+                        </a>
+                        <slot v-else>
+                            [20{{yearIter}}] {{ globalSettings.categories[category].pretty }}
+                        </slot>
+                    </slot>
+                </div>
+                <div class="category_menu_space" />
+            </slot>
+            <!--历年-->
+            <div class="category_menu_h1">
+                <h1>
+                    <slot v-if="showRelated">Older</slot>
+                    <slot v-else>Years</slot>
+                <h1>
+            </div>
+            <category-menu
+                v-for="yearIt in yearDesc"
+                :year="yearIt"
+                :category="category"
+                :fixedHeight="false"
+                :enableSameCategory="enableSameCategory || year!=yearIt" />
+        </div>
+    </script>
+
+    <!--分类视频列表右侧组件模板-->
+    <script type="text/x-template" id="ui-comp-template-session-item">
+        <div 
+            v-bind:class="['session_item', (isSearchItem?'':'session_item_'), category]"
+            @click="location.href='#' + composeSessionItemUrl(sessionItem)"
+        >
+            <div class="session_item_link">
+                <div class="item_item_link_icon">
+                    <div class='session_item_media_video' v-if="sessionItem.media!='slider'" />
+                    <div class='session_item_media_slider' v-if="sessionItem.media!='video'" />
+                </div>
+                <div class="session_item_link_title">
+                    <div class="session_item_link_title_href">
+                        <a v-bind:href="'#' + composeSessionItemUrl(sessionItem)">
+                            <slot v-if="showYear">[{{sessionItem.year}}]</slot>
+                            {{sessionItem.title}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="session_item_detail">
+                <div class="session_item_detail_table">
+                    <span class="session_item_detail_thead">Speaker: </span>
+                    <span>{{sessionItem.speaker}}</span>
+                </div>
+                <div class="session_item_detail_table">
+                    <span class="session_item_detail_thead">Company:</span>
+                    <span>{{sessionItem.company}}</span>
+                </div>
+                <div class="session_item_detail_table" v-if="sessionItem.overview!=''">
+                    <span class="session_item_detail_thead">Overview:</span>
+                    <span>{{sessionItem.overview}}</span>
+                </div>
+            </div>
+        <div>
+    </script>
+
+    <script type="text/x-template" id="ui-comp-template-session-list">
+        <div>
+            <div class="session_item_title" v-if="title != ''">{{title}}</div>
+            <!--The customer-sentiment component's template should have only one root element. -->
+            <session-item
+                v-for="(sessionItem,listIndex) in dataSource"
+                :showYear="yearprefix"
+                :category="sessionItem.shortcat"
+                :sessionItem="sessionItem"
+                :isSearchItem="isSearchItem"
+            />
+        </div>
+    </script>
+
+    <script type="text/x-template" id="ui-comp-template-searchbox">
+        <div id="search-component">
+            <div class="search_hint_dummy">
+            <transition name="hint-fade" mode="out-in">
+                <div class="search_example_hint" v-if="showExample && !showSearchHint()">
+                    <div>提示：输入 ‘横杠+年份/分类’ 启用过滤器。示例：halo, -14 -pg 只搜索2014年程序的视频。</div>
+                    <div>提示：输入逗号分隔关键字，示例：god of war, combat 搜索同时带有 combat 和 god of war 的词条。</div>
+                    <div>提示：多输入一个空格用于模糊搜索，示例：god of war  combat 搜索可能带有 combat 的关于 god of war 的词条。</div>
+                </div>
+                <div class="search_keyword_hint" v-if='showSearchHint()'>
+                    <div v-if="searchKeywords.length>0">keywords:{{searchKeywords}}</div>
+                    <div v-if="searchYears.length>0">year:{{searchYears}}</div>
+                    <div v-if="searchCategories.length>0">categories:{{searchCategories}}</div>
+                </div>
+            </transition>
+            </div>
+            <div class="search_field">
+                <div class="head_title" @click="$root.navigateToDefault">GDC</div>
+                <div class="search_box">
+                    <span>search:</span>
+                    <input id="search_input" v-model.trim="searchText" v-on:keyup.enter="submitSearchText"
+                        v-on:focus='showExample=true' v-on:blur="showExample=false">
+                    <div class="search_button_clear" @click="clearSearchText">x</div>
+                </div>
+            
+                <div class="search_filter_list_panel">
+                    <div class="search_filter_list">
+                        <span class="search_filter_year" @click="addFilterToken('-22')">-22</span>
+                        <span class="search_filter_year" @click="addFilterToken('-23')">-23</span>
+                        <span class="search_filter_year" @click="addFilterToken('-24')">-24</span>
+                        <span class="search_filter_year" @click="addFilterToken('-06')">-06</span>
+                        <span class="search_filter_year" @click="addFilterToken('-07')">-07</span>
+                        <span class="search_filter_year" @click="addFilterToken('-08')">-08</span>
+                        <span class="search_filter_year" @click="addFilterToken('-09')">-09</span>
+                        <span class="search_filter_year" @click="addFilterToken('-10')">-10</span>
+                        <span class="search_filter_year" @click="addFilterToken('-11')">-11</span>
+                        <span class="search_filter_year" @click="addFilterToken('-12')">-12</span>
+                        <span class="search_filter_year" @click="addFilterToken('-13')">-13</span>
+                        <span class="search_filter_year" @click="addFilterToken('-14')">-14</span>
+                        <span class="search_filter_year" @click="addFilterToken('-15')">-15</span>
+                        <span class="search_filter_year" @click="addFilterToken('-16')">-16</span>
+                        <span class="search_filter_year" @click="addFilterToken('-17')">-17</span>
+                        <span class="search_filter_year" @click="addFilterToken('-18')">-18</span>
+                        <span class="search_filter_year" @click="addFilterToken('-19')">-19</span>
+                        <span class="search_filter_year" @click="addFilterToken('-20')">-20</span>
+                        <span class="search_filter_year" @click="addFilterToken('-21')">-21</span>
+                    </div>
+                    <div class="search_filter_list">
+                        <span class="search_filter_category pg" @click="addFilterToken('-pg')">-pg</span>
+                        <span class="search_filter_category va" @click="addFilterToken('-va')">-va</span>
+                        <span class="search_filter_category de" @click="addFilterToken('-de')">-de</span>
+                        <span class="search_filter_category mo" @click="addFilterToken('-mo')">-mo</span>
+                        <span class="search_filter_category na" @click="addFilterToken('-na')">-na</span>
+                        <span class="search_filter_category ai" @click="addFilterToken('-ai')">-ai</span>
+                        <span class="search_filter_category pr" @click="addFilterToken('-pr')">-pr</span>
+                        <span class="search_filter_category ol" @click="addFilterToken('-ol')">-ol</span>
+                        <span class="search_filter_category bm" @click="addFilterToken('-bm')">-bm</span>
+                        <span class="search_filter_category au" @click="addFilterToken('-au')">-au</span>
+                        <span class="search_filter_category xg" @click="addFilterToken('-xg')">-xg</span>
+                        <span class="search_filter_category ux" @click="addFilterToken('-ux')">-ux</span>
+                        <span class="search_filter_category un" @click="addFilterToken('-un')">-un</span>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </script>
+
+    <!--list view组件-->
+    <script type="text/x-template" id="router-component-template-session-list-view">
+        <div>
+            <button class="category-menu-button" @click="$root.showCategoryMenu=!$root.showCategoryMenu;">{{$root.showCategoryMenu?'<<':'>>'}}</button>
+            <category-menu :class="$root.showCategoryMenu?'expand':'fold'" :showRelated="true" :year="year" :category="category" :enableSameCategory="false"/>
+            <div id="session_list">
+                <session-list :title="title" :isSearchItem="false" :dataSource="dataSource" />
+            </div>
+        </div>
+    </script>
+
+    <!--search view组件-->
+    <script type="text/x-template" id="router-comp-template-search-result-view">
+        <div>
+            <button class="category-menu-button" @click="$root.showCategoryMenu=!$root.showCategoryMenu;">{{$root.showCategoryMenu?'<<':'>>'}}</button>
+            <category-menu :class="$root.showCategoryMenu?'expand':'fold'" :showRelated="false" :year="''" :category="'Programming'" :enableSameCategory="true" />            
+            <div id="session_list">
+                <slot v-for="source in $root.searchResultSource">
+                    <session-list :title="source.title" :yearprefix="true" :isSearchItem="true" :dataSource="source" />
+                </slot>
+            </div>
+        </div>
+    </script>
+
+    <!--video view组件-->
+    <script type="text/x-template" id="router-comp-template-session-view">
+        <div>
+            <button class="category-menu-button" @click="$root.showCategoryMenu=!$root.showCategoryMenu;">{{$root.showCategoryMenu?'<<':'>>'}}</button>
+            <category-menu :class="$root.showCategoryMenu?'expand':'fold'" :showRelated="true" :year="year" :category="category" :enableSameCategory="true" />
+            <session-view :yearprefix="false" :sessionItem="sessionItem(year, category, sessionId)" />
+        </div>
+    </script>
+</head>
+
+<body>
+    <div id="container">
+        <div class="head">
+            <search-box></search-box>
+        </div>
+        <router-view id="main_frame" />
+    </div>
+</body>
+
+<script type="text/javascript" src="scripts/site/global_settings.js"></script>
+<script type="text/javascript" src="scripts/site/ui_comp_searchbox.js"></script>
+<script type="text/javascript" src="scripts/site/ui_comp_video_player.js"></script>
+<script type="text/javascript" src="scripts/site/ui_comp_category_menu_list.js"></script>
+<script type="text/javascript" src="scripts/site/ui_comp_session_list.js"></script>
+<script type="text/javascript" src="scripts/site/ui_comp_session_view.js"></script>
+
+<script type="text/javascript" src="scripts/site/router_comp_session_list_view.js"></script>
+<script type="text/javascript" src="scripts/site/router_comp_search_result_view.js"></script>
+<script type="text/javascript" src="scripts/site/router_comp_session_view.js"></script>
+<script type="text/javascript" src="scripts/site/router_root.js"></script>
+
+<script type="text/javascript" src="scripts/site/index.js"></script>
+
+</html>

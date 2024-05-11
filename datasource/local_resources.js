@@ -1,0 +1,1 @@
+var local_resources = {}
