@@ -34,8 +34,8 @@ const uiCompVideoPlayerController = Vue.extend({
             var speed_panel_control = document.getElementById("video_player_info_speed");
             video_player_control.playbackRate = speed;
             speed_panel_control.innerText = 'x ' + speed.toFixed(2);
-            video_player_control.srclang='zh';
-            video_player_control.translate='no';
+            video_player_control.srclang = 'zh';
+            video_player_control.translate = 'no';
         },
         toggleTheaterMode: function () {
             var video_player = document.getElementById("video_player")
@@ -79,25 +79,26 @@ const uiCompRemoteVideoPlayer = Vue.extend({
                 : this.sessionItem.vdownload);
         url = url.toLowerCase();
 
-        if (Hls.isSupported()) {
-            var video_player_control = document.getElementById('video_player');
+        var m3u8Url = decodeURIComponent(url)
+        var video_player_control = document.getElementById('video_player');
+        video_player_control.volume = 1.0;
 
+        if (video_player_control.canPlayType('application/vnd.apple.mpegurl') ) 
+        {
+            video_player_control.src = url;
+            video_player_control.style.width = "100%";
+        }
+        else if (Hls.isSupported()) 
+        {
             //不知道是不是这个绕开了domain
-            if (isRemoteMP4Address(url)) {
-                //动态设置绕开 cross domain 问题
-                video_player_control.src = url;
-                video_player_control.style.width = "100%";
-            }
-            else if (isRemoteM3U8Address(url)) {
-                video_player_control.volume = 1.0;
-                var hls = new Hls();
-                var m3u8Url = decodeURIComponent(url)
-                hls.loadSource(m3u8Url);
-                hls.attachMedia(video_player_control);
-                video_player_control.style.width = "100%";
-                video_player_control.translate = true;
-                video_player_control.srclang= 'en';
-            }
+            //动态设置绕开 cross domain 问题
+            //else if (isRemoteM3U8Address(url)) {
+            var hls = new Hls();
+            hls.loadSource(m3u8Url);
+            hls.attachMedia(video_player_control);
+            video_player_control.style.width = "100%";
+            video_player_control.translate = true;
+            video_player_control.srclang = 'en';
         }
     },
     methods: {

@@ -223,12 +223,14 @@
                 <local-video-player
                     v-if="getLocalVideoURL(sessionItem) != ''"
                     :sessionVideoURL="getLocalVideoURL(sessionItem)"
-                    :sessionSubtitleURL="getLocalSubtitlesURL(sessionItem)" />
+                    :sessionSubtitleURL="getLocalSubtitlesURL(sessionItem)"
+                />
                 <remote-video-player 
                     v-else
                     v-if="getRemoteVideoURL(sessionItem) != ''"
                     :sessionItem="sessionItem"
-                    :bus="globalBus" />
+                    :bus="globalBus"
+                />
             </div>
             <slot v-if="getLocalVideoURL(sessionItem) != '' || getRemoteVideoURL(sessionItem) != ''">
                 <session-video-comment :sessionItem="sessionItem"></session-video-comment>
