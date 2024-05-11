@@ -5,13 +5,34 @@ const uiCompSessionVideoComment = Vue.extend({
 	},
 	computed: {
 		commentURL: function () {
-			const url = 'http://fake-gdc-vault-internal.url/'
+			const url = 'https://gdc-search.github.io/'
 				+ this.sessionItem.year + '/'
 				+ this.sessionItem.shortcat + '/'
 				+ this.sessionItem.vid;
 			return url;
 		}
 
+	},
+	mounted: function() {
+		document.title = this.sessionItem.title;
+		let b = document.createElement('script');
+		b.setAttribute('data-repo', "gdc-search/gdc-search.github.io");
+		b.setAttribute('data-repo-id', "R_kgDOL6GVLg");
+		b.setAttribute('data-category', "Comments");
+		b.setAttribute('data-category-id', "DIC_kwDOL6GVLs4CfSZS");
+		b.setAttribute('data-mapping', "title");
+		b.setAttribute('data-strict', "0");
+		b.setAttribute('data-reactions-enabled', "0");
+		b.setAttribute('data-emit-metadata', "0");
+		b.setAttribute('data-input-position', "top");
+		b.setAttribute('data-theme', "light");
+		b.setAttribute('data-lang', "en");
+		b.setAttribute('data-loading', "lazy");
+		b.async = true;
+		b.src = 'https://giscus.app/client.js';
+		b.crossorigin = "anonymous";
+		document.getElementsByClassName('remote_comments_panel')[0].appendChild(b)
+		
 	}
 });
 
@@ -55,5 +76,21 @@ const uiCompSessionView = Vue.extend({
 
 
 
-
-
+/*
+<script src="https://giscus.app/client.js"
+data-repo				="gdc-search/gdc-search.github.io"
+data-repo-id			="R_kgDOL6GVLg"
+data-category			="General"
+data-category-id		="DIC_kwDOL6GVLs4CfSZS"
+data-mapping			="url"
+data-strict				="0"
+data-reactions-enabled	="1"
+data-emit-metadata		="0"
+data-input-position		="top"
+data-theme				="light"
+data-lang				="zh-CN"
+data-loading			="lazy"
+crossorigin="anonymous"
+async>
+</script>
+*/

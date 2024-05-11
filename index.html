@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title> GDC Vault Internal </title>
+    <title>GDC Session Searcher</title>
 
     <link rel="stylesheet" type="text/css" href="styles/style-index.css">
     <link rel="stylesheet" type="text/css" href="styles/style-search-box.css">
@@ -11,7 +11,6 @@
 
     <script type="text/javascript" src="scripts/modules/vue.min.js"></script>
     <script type="text/javascript" src="scripts/modules/vue-router.js"></script>
-    <script type="text/javascript" src="scripts/modules/vue-disqus.js"></script>
     <script type="text/javascript" src="scripts/modules/lodash.js"></script>
     <script type="text/javascript" src="scripts/modules/hls.min.js"></script>
     <script type="text/javascript" src="scripts/site/global_bus.js"></script>
@@ -43,12 +42,7 @@
     <!--评论区留言-->
     <script type="text/x-template" id="ui-comp-template-session-video-comment">
         <div class="remote_comments_panel">
-            <!--div>Disqus - scientific comments</div-->
-            <vue-disqus 
-                shortname="gdc-internal"
-                :url="commentURL"
-            ></vue-disqus>
-            </div>
+        </div>
     </script>
 
     <!--视频播放器速度控制器模板-->
@@ -78,7 +72,7 @@
             <div class="session_view_desc_line">使用本地视频播放器</div>
             <br/>
             <div class="video_control">
-                <video id="video_player" controls="" autoplay="">
+                <video id="video_player" controls="" autoplay="" playsinline >
                     <source
                         :src="sessionVideoURL"
                         type="video/mp4" />
@@ -97,7 +91,7 @@
         <!--跨域问题没办法解决，所直接用chrome 的http访问-->
         <div>  
             <div class="video_control" @keyup.esc="onEscPressed">
-                <video id="video_player" controls=""></video>
+                <video id="video_player" controls="" playsinline></video>
                 <div>中文字幕需要在控制选项里的Captions手动切换</div>
             </div>
         	<video-player-controller :bus="globalBus" />
