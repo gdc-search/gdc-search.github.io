@@ -18,7 +18,7 @@ const uiCompSessionVideoComment = Vue.extend({
 		let b = document.createElement('script');
 		b.setAttribute('data-repo', "gdc-search/gdc-search.github.io");
 		b.setAttribute('data-repo-id', "R_kgDOL6GVLg");
-		b.setAttribute('data-category', "Comments");
+		b.setAttribute('data-category', "General");
 		b.setAttribute('data-category-id', "DIC_kwDOL6GVLs4CfSZS");
 		b.setAttribute('data-mapping', "title");
 		b.setAttribute('data-strict', "0");
