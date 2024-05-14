@@ -22,7 +22,7 @@ const uiCompSessionVideoComment = Vue.extend({
 		b.setAttribute('data-category-id', "DIC_kwDOL6GVLs4CfSZS");
 		b.setAttribute('data-mapping', "title");
 		b.setAttribute('data-strict', "0");
-		b.setAttribute('data-reactions-enabled', "0");
+		b.setAttribute('data-reactions-enabled', "1");
 		b.setAttribute('data-emit-metadata', "0");
 		b.setAttribute('data-input-position', "top");
 		b.setAttribute('data-theme', "light");
