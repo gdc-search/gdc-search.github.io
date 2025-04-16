@@ -1,6 +1,7 @@
 const globalSettings = {
 
     dataSources: {
+        "25": datasource_2025,
         "24": datasource_2024,
         "23": datasource_2023,
         "22": datasource_2022,
@@ -45,7 +46,7 @@ const globalSettings = {
     },
 
     current: {
-        year: '24',
+        year: '25',
         category: 'pg'
     }
 };
