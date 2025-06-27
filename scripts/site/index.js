@@ -9,12 +9,18 @@ const rootComponent = {
     mounted: function () {
         var currPath = this.$router.currentRoute.path;
         if (currPath == '/') this.navigateToDefault();
+        // 监听窗口大小变化
+        this.isMobile = window.innerWidth <= 768; 
+        window.addEventListener('resize', this.handleResize);
+        window.addEventListener('scroll', this.onScroll);
     },
 
     data: {
         searchResult: [],
         isSearching: false,
-        showCategoryMenu: true
+        showCategoryMenu: false,
+        isMobile: false,
+        windowScrollTop:0
     },
     components: {
         "search-box": uiCompSearchBox
@@ -22,6 +28,18 @@ const rootComponent = {
     computed: {
         searchResultSource: function () {
             return this.searchResult;
+        }
+    },
+    watch: { 
+        isMobile: {
+            handler: function (newVal) {
+                if (newVal) {
+                    document.body.style.overflowX = "hidden"
+                }else{
+                    document.body.style.overflowX = "auto"
+                }
+            },
+            deep: true
         }
     },
     //提供给网站的集成功能
@@ -45,7 +63,18 @@ const rootComponent = {
             this.searchResult = [];
             this.isSearching = false;
             this.navigateToDefault();
+        },
+        // 处理窗口大小变化的逻辑
+        handleResize: function () {
+            // 判断是否是移动端
+            this.isMobile = window.innerWidth <= 768; 
+        },
+        onScroll:function () {
+            this.windowScrollTop = window.scrollY; 
         }
+    },
+    beforeDestroy: function () {
+        window.removeEventListener('resize', this.handleResize);
     }
 }
 

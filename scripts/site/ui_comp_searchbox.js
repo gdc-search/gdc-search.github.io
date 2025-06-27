@@ -515,6 +515,7 @@ const uiCompSearchBox = Vue.extend({
             searchKeywords: [],
             searchYears: [],
             searchCategories: [],
+            showExampleTimer:null
         }
     },
 
@@ -525,6 +526,17 @@ const uiCompSearchBox = Vue.extend({
     watch: {
         searchText: function () {
             searchContext.createSearchRequest(this.searchText);
+        },
+        showExample: {
+            handler: function (newVal) {
+                if (newVal && this.$root.isMobile) {
+                    clearTimeout( this.showExampleTimer);
+                    this.showExampleTimer = setTimeout(() => {
+                        this.showExample = false;
+                    }, 2000);
+                }
+            },
+            deep: true
         }
     },
     methods: {

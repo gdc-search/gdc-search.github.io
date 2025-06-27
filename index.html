@@ -2,6 +2,8 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+    <meta content="yes" name="apple-touch-fullscreen">
     <title>GDC Session Searcher</title>
 
     <link rel="stylesheet" type="text/css" href="styles/style-index.css">
@@ -366,7 +368,7 @@
                     <div>提示：输入逗号分隔关键字，示例：god of war, combat 搜索同时带有 combat 和 god of war 的词条。</div>
                     <div>提示：多输入一个空格用于模糊搜索，示例：god of war  combat 搜索可能带有 combat 的关于 god of war 的词条。</div>
                 </div>
-                <div class="search_keyword_hint" v-if='showSearchHint()'>
+                <div class="search_keyword_hint" v-if='showExample && showSearchHint()'>
                     <div v-if="searchKeywords.length>0">keywords:{{searchKeywords}}</div>
                     <div v-if="searchYears.length>0">year:{{searchYears}}</div>
                     <div v-if="searchCategories.length>0">categories:{{searchCategories}}</div>
@@ -427,7 +429,10 @@
     <!--list view组件-->
     <script type="text/x-template" id="router-component-template-session-list-view">
         <div>
-            <button class="category-menu-button" @click="$root.showCategoryMenu=!$root.showCategoryMenu;">{{$root.showCategoryMenu?'<<':'>>'}}</button>
+            <div v-if="$root.isMobile" class="category-menu-button-div" :class="($root.windowScrollTop>40 && !$root.showCategoryMenu)?'bgf':'bg0'">
+                <div class="category-menu-button" :class="$root.showCategoryMenu?'on':'off'" @click="$root.showCategoryMenu=!$root.showCategoryMenu;"></div>
+            </div>
+            <button v-else class="category-menu-button" @click="$root.showCategoryMenu=!$root.showCategoryMenu;">{{$root.showCategoryMenu?'<<':'>>'}}</button>
             <category-menu :class="$root.showCategoryMenu?'expand':'fold'" :showRelated="true" :year="year" :category="category" :enableSameCategory="false"/>
             <div id="session_list">
                 <session-list :title="title" :isSearchItem="false" :dataSource="dataSource" />
@@ -438,7 +443,9 @@
     <!--search view组件-->
     <script type="text/x-template" id="router-comp-template-search-result-view">
         <div>
-            <button class="category-menu-button" @click="$root.showCategoryMenu=!$root.showCategoryMenu;">{{$root.showCategoryMenu?'<<':'>>'}}</button>
+            <div v-if="$root.isMobile" class="category-menu-button-div" :class="($root.windowScrollTop>40 && !$root.showCategoryMenu)?'bgf':'bg0'">
+                <div class="category-menu-button" :class="$root.showCategoryMenu?'on':'off'" @click="$root.showCategoryMenu=!$root.showCategoryMenu;"></div>
+            </div>            <button v-else class="category-menu-button" @click="$root.showCategoryMenu=!$root.showCategoryMenu;">{{$root.showCategoryMenu?'<<':'>>'}}</button>
             <category-menu :class="$root.showCategoryMenu?'expand':'fold'" :showRelated="false" :year="''" :category="'Programming'" :enableSameCategory="true" />            
             <div id="session_list">
                 <slot v-for="source in $root.searchResultSource">
@@ -451,7 +458,9 @@
     <!--video view组件-->
     <script type="text/x-template" id="router-comp-template-session-view">
         <div>
-            <button class="category-menu-button" @click="$root.showCategoryMenu=!$root.showCategoryMenu;">{{$root.showCategoryMenu?'<<':'>>'}}</button>
+            <div v-if="$root.isMobile" class="category-menu-button-div" :class="($root.windowScrollTop>40 && !$root.showCategoryMenu)?'bgf':'bg0'">
+                <div class="category-menu-button" :class="$root.showCategoryMenu?'on':'off'" @click="$root.showCategoryMenu=!$root.showCategoryMenu;"></div>
+            </div>            <button v-else class="category-menu-button" @click="$root.showCategoryMenu=!$root.showCategoryMenu;">{{$root.showCategoryMenu?'<<':'>>'}}</button>
             <category-menu :class="$root.showCategoryMenu?'expand':'fold'" :showRelated="true" :year="year" :category="category" :enableSameCategory="true" />
             <session-view :yearprefix="false" :sessionItem="sessionItem(year, category, sessionId)" />
         </div>
@@ -462,6 +471,10 @@
     <div id="container">
         <div class="head">
             <search-box></search-box>
+        </div>
+        <div class="main-content-mask"
+            v-if="$root.showCategoryMenu"
+            @click="$root.showCategoryMenu = false">
         </div>
         <router-view id="main_frame" />
     </div>
