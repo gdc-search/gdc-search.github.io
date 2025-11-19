@@ -42,12 +42,6 @@
     <script type="text/javascript" src="datasource/gdcvault2025.js"></script>
     <script type="text/javascript" src="datasource/local_resources.js"></script>
 
-    <!--评论区留言-->
-    <script type="text/x-template" id="ui-comp-template-session-video-comment">
-        <div class="remote_comments_panel">
-        </div>
-    </script>
-
     <!--视频播放器速度控制器模板-->
     <script type="text/x-template" id="ui-comp-template-video-player-controller">
         <div class="video_player_controller">
@@ -235,9 +229,6 @@
                     :bus="globalBus"
                 />
             </div>
-            <slot v-if="getLocalVideoURL(sessionItem) != '' || getRemoteVideoURL(sessionItem) != ''">
-                <session-video-comment :sessionItem="sessionItem"></session-video-comment>
-            </slot>
         </div>
     </script>
 
